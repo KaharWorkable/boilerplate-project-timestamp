@@ -20,13 +20,55 @@ app.get("/", function (req, res) {
 
 
 // your first API endpoint... 
-app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
+app.get("/api", function (req, res) {
+  res.json({
+    unix : new Date().getTime(),
+    utc : new Date().toUTCString()
+  })
 });
 
+app.get("/api/:timestamp", function (req, res) {
+  const timestamp = req.params.timestamp;
 
+  if(!isNaN(timestamp) && timestamp.length === 13){
+    res.json({
+      unix : timestamp,
+      utc : new Date(parseInt(timestamp)).toUTCString()
+    })
+  }
+  else if(!isNaN(timestamp) && timestamp.length !== 13){
+    res.json({
+      error : "Invalid Date"
+    })
+  }else if(isNaN(timestamp)){
+    const date = new Date(timestamp);
+    if(date.toString() === "Invalid Date"){
+      res.json({
+        error : "Invalid Date"
+      })
+    }
+    else{
+      res.json({
+        unix : date.getTime(),
+        utc : date.toUTCString()
+      })
+    }
+  }
+
+  if(new Date(timestamp).toString() === "Invalid Date"){
+    res.json({
+      error : "Invalid Date"
+    })
+  }else{
+    res.json({
+      unix : new Date(timestamp).getTime(),
+      utc : new Date(timestamp).toUTCString()
+    })
+  }
+
+});
 
 // listen for requests :)
-var listener = app.listen(process.env.PORT, function () {
+var listener = app.listen(3000, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
